@@ -549,6 +549,22 @@
 
      ​		一些本地构建工具总是并行构建。<jobs>值为1可用于将作业限制为单个作业。
 
+     `--target <tgt>..., -t <tgt>...` 生成<tgt>而不是默认目标。可以给出多个目标，用空格分隔。
+
+     `--config <cfg>` 对于多配置工具，请选择“configuration <cfg>”。
+
+     `--clean-first` 首先构建clean的目标，然后再构建。(如果只进行清理，请使用`——target clean`。)
+
+     `--resolve-package-references=<on|off|only>` 在构建之前解析来自外部包管理器(例如NuGet)的远程包引用。当设		置为on(默认)时，将在构建目标之前恢复包。当设置为only时，将恢复包，但不会执行任何构建。当设置为off		时，将不会恢复任何包。如果目标没有定义任何包引用，则此选项不执行任何操作。这个设置可以在构建预设中		指定(使用resolvePackageReferences)。如果指定了此命令行选项，则将忽略预设设置。如果没有提供命令行参		数或预设选项，将计算一个特定于环境的缓存变量来决定是否应该执行包恢复。当使用Visual Studio生成器时，		使用VS_PACKAGE_REFERENCES属性定义包引用。使用NuGet恢复包引用。可以通过将CMAKE_VS_NUGET_PACKAGE_RESTORE变量设置为OFF来禁用它。
+
+     `--user-stderr` 忽略了。行为在CMake >= 3.0中是默认的
+
+     `--verbose,-v` 启用详细输出(如果支持)，包括要执行的构建命令。如果设置了VERBOSE环境变量或CMAKE_VERBOSE_MAKEFILE缓存变量，则可以省略此选项。
+
+     `--` 将剩下的选项传递给本机工具。
+
+     运行`cmake --build`，不带任何快速帮助选项。
+
      
 
 6. <span id= "6">安装项目</span>
