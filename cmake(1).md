@@ -569,16 +569,248 @@
 
 6. <span id= "6">安装项目</span>
 
+     CMake提供了一个命令行签名来安装已经生成的项目二叉树:
+
+     ```
+     cmake --install <dir> [<options>]
+     ```
+
+     在不使用生成的生成系统或本机生成工具而构建项目以运行安装之后，可以使用此方法。可选项是:
+
+     `--install <dir>` 要安装的项目二进制目录。这是必须的，而且必须是首要的。
+
+     `--config <cfg>` 对于多配置生成器，选择configuration <cfg>。
+
+     `--component <comp>` 基于组件的安装。只安装组件<comp>。
+
+     `--default-directory-permissions <permissions>` 默认目录安装权限。权限格式<u=rwx,g=rx,o=rx>。
+
+     `prefix <prefix>` 覆盖安装前缀CMAKE_INSTALL_PREFIX。
+
+     `--strip` 去除之前的安装
+
+     `-v,--verbose` 启用详细输出,如果设置了VERBOSE环境变量，则可以省略此选项。
+
+     运行`cmake --install`，不带任何快速帮助选项。
+
 7. <span id= "7">打开项目</span>
+
+     `cmake --open <dir>` 在关联的应用程序中打开生成的项目。这只被一些生成器支持。
 
 8. <span id= "8">运行脚本</span>
 
+     `cmake [{-D <var>=<value>}...] -P <cmake-script-file> [-- <unparsed-options>...]` 将给定的cmake文件作为用cmake语言编写的脚本处理。不执行配置或生成步骤，也不修改缓存。如果使用-D定义变量，则必须在-P参数之前完成此操作,在`——`之后的任何选项都不会被CMake解析，但它们仍然包含在传递给脚本的CMAKE_ARGV<n>变量集合中(包括`——`本身)。
+
 9. <span id= "9">运行命令行工具</span>
 
-10. <span id= "10">运行查找包工具</span>
+     CMake通过签名提供内置的命令行工具
 
-11. <span id= "11">查看帮助</span>
+     `cmake -E <command> [<options>]` 执行`cmake -E`或`cmake -E help`查看命令的摘要。可用的命令是:
 
-12. <span id= "12">返回值</span>
+     `capabilities` 3.7新版功能。以JSON格式报告cmake功能。输出是一个带有以下键的JSON对象:
 
-13. <span id="13">参考</span>
+     ​		`version` 带有版本信息的JSON对象。键是:
+
+     ​				`string` `cmake --version`显示的完整版本字符串。
+
+     ​				`major` 以整数形式表示的主版本号。
+
+     ​				`minor ` 整数形式的副版本号。
+
+     ​				`patch ` 整数形式的补丁级别。
+
+     ​				`suffix` cmake版本后缀字符串。
+
+     ​				`isDirty` 如果cmake构建来自脏树，则设置该bool值
+
+     ​		`generators` 一个可用生成器列表。每个生成器都是一个JSON对象，具有以下键:
+
+     ​				`name` 包含生成器名称的字符串
+
+     ​				`toolsetSupport` 如果生成器支持工具集，则为True，否则为false。
+
+     ​				`platformSupport ` 如果生成器支持平台，则为True，否则为false。
+
+     ​				`supportedPlatforms` 3.2.1新版功能。当生成器通过CMAKE_GENERATOR_PLATFORM (-A…)支持平台规															范时可能出现的可选成员。该值是已知受支持的平台的列表。
+
+     ​				`extraGenerators` 包含与生成器兼容的所有额外生成器的字符串列表。
+
+     ​		`fileApi` 当`cmake-file-api(7)`可用时出现的可选成员。该值是一个带有一个成员的JSON对象:
+
+     ​				`requests` 包含0个或多个支持的文件api请求的JSON数组。每个请求都是一个带有成员的JSON对象
+
+     ​						`kind ` 指定一个支持的对象类型。
+
+     ​						`version` 一个JSON数组，它的每个元素都是一个JSON对象，包含主要成员和次要成员，指定非负整									数版本组件
+
+     ​		`serverMode` 如果cmake支持服务器模式，则为True，否则为false。自CMake 3.20以来始终为false。
+
+     `cat [--] <files>...` 3.18新版功能。连接文件并在标准输出上打印。3.24新版功能:增加了对双破折号参数`——`的支		持。cat的这个基本实现不支持任何选项，因此使用以-开头的选项将导致错误。如果文件以-开头，则使用`——`来		指示选项的结束。
+
+     `chdir <dir> <cmd> [<arg>...]` 更改当前工作目录并运行命令。
+
+     `compare_files [--ignore-eol] <file1> <file2>` 检查<file1>是否与<file2>相同。如果文件相同，则返回0，否		则返回1。在无效参数的情况下，它返回2。3.14新版功能:`——ignore-eol`选项暗示行级比较并忽略LF/CRLF差异
+
+     `copy <file>... <destination>` 将文件复制到<目标>(文件或目录)。如果指定了多个文件，<destination>必须是		directory且必须存在。不支持通配符。复制遵循符号链接。这意味着它不复制符号链接，而是复制它所指向的文		件或目录。3.5新版功能:支持多个输入文件。
+
+     `copy_directory <dir>... <destination>` 复制<dir>…目录到<目标>目录。如果<destination>目录不存在，它		将被创建。Copy_directory遵循符号链接。3.5新版功能:支持多个输入目录。3.15新版功能:当源目录不存在时，		命令会失败。以前它通过创建一个空的目标目录成功。
+
+     `copy_if_different <file>... <destination>` 如果文件已经更改，则将文件复制到<destination>(文件或目录)。		如果指定了多个文件，<destination>必须是directory且必须存在。Copy_if_different跟随符号链接。
+
+     `create_symlink <old> <new>` 创建一个符号链接<新>命名<旧>。3.13新版功能:支持在Windows上创建符号链接,**注		意**创建<new>符号链接的路径必须事先存在。
+
+     `create_hardlink <old> <new>` 3.19新版功能。创建硬链接<新>命名<旧>。**注意**创建<new>硬链接的路径必须事先存		在。<old>必须事先存在。
+
+     `echo [<string>...]` 将参数显示为文本
+
+     `echo_append [<string>...]` 将参数显示为文本，但不显示新行。
+
+     `env [--unset=name ...] [NAME=VALUE ...] [--] <command> [<arg>...]` 3.1新版功能。在修改后的环境中执行命		令。3.24新版功能:增加了对双破折号参数——的支持。使用——停止解释选项/环境变量，并将下一个参数视为		命令，即使它以-或包含=开头。
+
+     `environment` 显示当前的环境变量
+
+     `false` 3.16新版功能。什么都不做，退出代码为1。
+
+     `make_directory <dir>...` 创建< dir >目录。如果有必要，也创建父目录。如果一个目录已经存在，它将被静默地忽		略。3.5新版功能:支持多个输入目录。
+
+     `md5sum <file>...` 创建md5sum兼容格式的MD5校验和文件:
+
+     `sha1sum <file>...` 创建SHA1校验和文件的sha1sum兼容格式:
+
+     `sha224sum <file>...` 创建SHA224校验和文件的sha224sum兼容格式:
+
+     `sha256sum <file>...` 创建SHA256校验和文件，格式为sha256sum兼容:
+
+     `sha384sum <file>...` 创建SHA384校验和文件的sha384sum兼容格式:
+
+     `sha512sum <file>...` 创建SHA512校验和文件，格式为sha512sum兼容:
+
+     `remove [-f] <file>...` 3.17版后已移除。删除文件(s)。计划的行为是，如果列出的任何文件已经不存在，该命令返		回一个非零的退出代码，但不记录任何消息。-f选项改变行为，在这种情况下返回零退出码(即成功)。移除不跟随		符号链接。这意味着它只删除符号链接，而不删除它所指向的文件。实现有bug，总是返回0。如果不破坏向后兼		容性，就无法解决这个问题。使用rm。
+
+     `remove_directory <dir>...` 3.17版后已移除。删除<dir>目录及其内容。如果一个目录不存在，它将被静默地忽		略。使用rm。3.15新版功能:支持多个目录。3.16新版功能:如果<dir>是指向某个目录的符号链接，则只删除符		号链接。
+
+     `rename <oldname> <newname>` 重命名一个文件或目录(在一个卷上)。如果具有<newname>名称的文件已经存在，那么		它将被静默替换。
+
+     `rm [-rRf] [--] <file|dir>...` 3.17新版功能。删除文件<file>或目录<dir>。使用-r或-R可递归删除目录及其内		容。如果列出的任何文件/目录不存在，该命令将返回一个非零的退出代码，但不记录任何消息。-f选项改变行		为，在这种情况下返回零退出码(即成功)。使用——停止解释选项并将所有剩余参数视为路径，即使它们以-开		头。
+
+     `server`  发射cmake-server(7)模式。
+
+     `sleep <number>...` 3.0新版功能。睡眠时间是固定的。
+
+     `tar [cxt][vf][zjJ] file.tar [<options>] [--] [<pathname>...]` 创建或提取tar或zip归档文件。选项有:
+
+     ​		`c` 创建一个包含指定文件的新存档。如果使用<pathname>…参数是强制性的。
+
+     ​		`x` 从存档提取到磁盘。3.15新版功能:<pathname>…参数只能用于提取选定的文件或目录。当提取选定的文件				或目录时，必须提供它们的确切名称，包括由list (-t)打印的路径。
+
+     ​		`t` 归档内容列表。3.15新版功能:<pathname>…参数可用于仅列出选定的文件或目录
+
+     ​		`v` 生成详细输出。
+
+     ​		`z` 使用gzip压缩生成的归档文件。
+
+     ​		`j` 使用bzip2压缩生成的存档文件。
+
+     ​		`J` 3.1新版功能。使用XZ压缩结果存档
+
+     ​		`--zstd` 3.15新版功能。使用Zstandard压缩结果存档。
+
+     ​		`--files-form=<file>` 3.1新版功能。从给定的文件中读取文件名，每行一个。空行被忽略。行不能以-开头，除				非——add-file=<name>添加名称以-开头的文件。
+
+     ​		`--format=<format>` 3.3新版功能。指定要创建的存档的格式。支持的格式有:7zip、gnutar、pax、paxr(受限					pax，默认)、zip。
+
+     ​		`--mtime=<date>`  3.1新版功能。指定在tarball条目中记录的修改时间。
+
+     ​		`--touch` 3.24新版功能。使用当前本地时间戳，而不是从存档中提取文件时间戳。
+
+     ​		`--` 3.1新版功能。停止解释选项，并将所有剩余参数视为文件名，即使它们以-开头。
+
+     `time <command> [<args>...]` 执行命令并显示运行时间。3.5新版功能:该命令现在正确地将带有空格或特殊字符的参		数传递给子进程。这可能会破坏那些通过自己的额外引用或转义绕过bug的脚本。
+
+     `touch <file>...` 如果文件不存在，则创建<文件>。如果<文件>存在，则它正在更改<文件>的访问和修改次数。
+
+     `touch_nocreate <file>...` touch一个文件，如果它存在，但不创建它。如果一个文件不存在，它将被静默地忽略。
+
+     `true` 3.16新版功能。什么都不做，退出码为0。
+
+10. windows命令行工具
+
+     以下cmake -E命令仅适用于Windows系统:
+
+     `delete_regv <key>` 删除Windows注册表值。
+
+     `env_vs8_wince <sdkname>` 3.2新版功能。显示一个批处理文件，为VS2005中安装的Windows CE SDK设置环境。
+
+     `env_vs9_wince <sdkname>` 3.2新版功能。显示一个批处理文件，为VS2008中安装的Windows CE SDK设置环境。
+
+     `write_regv <key> <value>` 写入Windows注册表值。
+
+11. <span id= "10">运行查找包工具</span>
+
+      CMake为基于makefile的项目提供了类似pkg-config的帮助器:
+
+      `cmake --find-package [<options>]` 它使用find_package()搜索包并将结果标志打印到stdout。这可以代替pkg-config		在普通的基于makefile的项目或基于autoconf的项目中查找已安装的库(通过share/aclocal/cmake.m4)。由于一些		技术限制，该模式不太受支持。保留它是为了兼容性，但不应该在新项目中使用。
+
+12. <span id= "11">查看帮助</span>
+
+      要从CMake文档中打印选定的页面，请使用
+
+      `cmake --help[-<topic>]` 使用以下选项之一:
+
+      ​		`--help,-help,-usage,-h,-H,/?` 打印使用信息并退出。用法描述基本命令行接口及其选项。
+
+      ​		`--version,-version,/V [<f>]` 显示程序名称/版本栏并退出。如果指定了一个文件，则会将版本写入其中。如果				给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-full [<f>]` 打印所有帮助手册并退出。所有手册都以人类可读的文本格式印刷。如果给出了帮助，则将				帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-manual <man> [<f>]` 打印一个帮助手册并退出。指定的手册以人类可读的文本格式打印。如果给出了帮				助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-manual-list [<f>]` 列出可用的帮助手册并退出。该列表包含所有可以通过使用——help-manual选项后				接手册名称获得帮助的手册。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-command <cmd> [<f>]` 打印一个命令的帮助并退出。<cmd>的cmake-commands(7)手动条目以人类可读				的文本格式打印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-command-list [<f>]` 列出具有可用帮助的命令并退出。该列表包含所有命令，可以通过使用后跟命令名				的——help-command选项获得帮助。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-commands [<f>]` 打印cmake命令手册并退出。cmake-commands(7)手册以人类可读的文本格式打印。				如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-module <mod> [<f>]` 打印一个模块的帮助并退出。<mod>的cmake-modules(7)手动条目以人类可读的文				本格式打印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-module-list [<f>]` 列出具有可用帮助的模块并退出。该列表包含所有可以通过使用——help-module选				项后跟模块名获得帮助的模块。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-modules [<f>]` 打印cmake-modules手册并退出。cmake-modules(7)手册以人类可读的文本格式打印。				如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-policy <cmp> [<f>]` 打印一个策略的帮助并退出。<cmp>的cmake-policies(7)手动条目以人类可读的文				本格式打印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-policy-list [<f>]` 列出具有可用帮助的策略并退出。该列表包含所有可以通过使用——help-policy选项				后接策略名称获得帮助的策略。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-policies [<f>]` 打印cmake-policies手册并退出。cmake-policies(7)手册以人类可读的文本格式打印。				如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-property <prop [<f>]>` 打印一个属性的帮助并退出。<prop>的cmake-properties(7)手动条目以人类可				读的文本格式打印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-property-list [<f>]` 列出带有可用帮助的属性并退出。该列表包含所有可以通过使用后面跟着属性名				的——help-property选项获得帮助的属性。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-properties [<f>]` 打印cmake-properties手册并退出。cmake-properties(7)手册以人类可读的文本格式				打印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-variable <var> [<f>]` 打印一个变量的帮助并退出。<var>的cmake-variables(7)手动条目以人类可读				的文本格式打印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-variable-list [<f>]` 列出具有可用帮助的变量并退出。该列表包含所有可以通过使用——help-variable				选项后跟变量名获得帮助的变量。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      ​		`--help-variables [<f>]` 打印cmake-variables手册并退出。cmake-variables(7)手册以人类可读的文本格式打				印。如果给出了帮助，则将帮助打印到名为<f>ile的文件中。
+
+      若要查看项目可用的预置，请使用
+
+      `cmake <source-dir> --list-presets`
+
+13. <span id= "12">返回值</span>
+
+      在常规终止时，cmake可执行程序返回退出代码0。
+
+      如果终止是由命令消息(FATAL_ERROR)或其他错误条件引起的，则返回一个非零退出码。
+
+14. <span id="13">参考</span>
+
+      以下资源可用于使用CMake获得帮助:
+
+      - [Home Page]([https://cmake.org](https://cmake.org/))
+      - [Online Documentation and Community Resources](https://cmake.org/documentation)
+      - [Discourse Forum]([https://discourse.cmake.org](https://discourse.cmake.org/))
