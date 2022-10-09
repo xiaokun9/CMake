@@ -811,6 +811,6 @@
 
       以下资源可用于使用CMake获得帮助:
 
-      - [Home Page]([https://cmake.org](https://cmake.org/))
+      - [Home Page](https://cmake.org/)
       - [Online Documentation and Community Resources](https://cmake.org/documentation)
-      - [Discourse Forum]([https://discourse.cmake.org](https://discourse.cmake.org/))
+      - [Discourse Forum](https://discourse.cmake.org)
