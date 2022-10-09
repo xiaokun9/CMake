@@ -46,7 +46,7 @@
 
 5. 指导
 
-   - <span id = "5">CMake教程</span>
+   - [<span id = "5">CMake教程</span>](./CMake教程.md)
    - <span id = "1">用户交互指南</span>
    - <span id = "4">使用依赖项指南</span>
    - 导出和导入指南
